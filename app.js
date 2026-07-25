@@ -15,6 +15,8 @@ CODIGO DEL REGISTRO
 //SE CREA LA RUTA PARA EL REGISTRO
 app.post("/registro", (req, res) => {
     const { usuario, password } = req.body;
+    const existe = persona.find(u => u.usuario === usuario);
+
     persona.push({
         usuario,
         password
@@ -47,6 +49,87 @@ app.post("/login", (req, res) => {
             mensaje: "ERROR DE AUTENTICACION"
         });
     }
+});
+
+/*========================================================================
+consultar todos los usuarios
+===========================================================================
+*/
+app.get("/usuarios", (req, res) => {
+    res.json(persona);
+});
+/*========================================================================
+consultar un usuario
+===========================================================================
+*/
+app.get("/usuarios/:usuario", (req, res) => {
+
+    const usuario = req.params.usuario;
+
+    const encontrado = persona.find(
+        u => u.usuario === usuario
+    );
+
+    if (!encontrado) {
+        return res.status(404).json({
+            mensaje: "USUARIO NO ENCONTRADO"
+        });
+    }
+
+    res.json(encontrado);
+
+});
+
+/*========================================================================
+ACTUALIZAR USUARIO
+========================================================================*/
+app.put("/usuarios/:usuario", (req, res) => {
+
+    const usuario = req.params.usuario;
+    const { password } = req.body;
+
+    const encontrado = persona.find(
+        u => u.usuario === usuario
+    );
+
+    if (!encontrado) {
+        return res.status(404).json({
+            mensaje: "USUARIO NO ENCONTRADO"
+        });
+    }
+
+    encontrado.password = password;
+
+    res.json({
+        mensaje: "USUARIO ACTUALIZADO CORRECTAMENTE",
+        usuario: encontrado
+    });
+
+});
+
+/*========================================================================
+ELIMINAR USUARIO
+========================================================================*/
+app.delete("/usuarios/:usuario", (req, res) => {
+
+    const usuario = req.params.usuario;
+
+    const indice = persona.findIndex(
+        u => u.usuario === usuario
+    );
+
+    if (indice === -1) {
+        return res.status(404).json({
+            mensaje: "USUARIO NO ENCONTRADO"
+        });
+    }
+
+    persona.splice(indice, 1);
+
+    res.json({
+        mensaje: "USUARIO ELIMINADO CORRECTAMENTE"
+    });
+
 });
 
 app.listen(PORT, () => {
